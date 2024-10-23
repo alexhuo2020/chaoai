@@ -127,7 +127,7 @@ class LMConfig:
     vocab_size: int = 65
     num_heads: int = 6
     mlp_hidden_dim: int = 1024
-    mlp_act_fn: Callable[[torch.Tensor], torch.Tensor] = F.silu
+    mlp_act_fn: Callable[[torch.Tensor], torch.Tensor] = lambda x: F.silu
 
 # @dataclass
 # class LMConfig:
