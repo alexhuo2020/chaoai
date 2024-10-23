@@ -43,7 +43,7 @@ print(eval_dataset)
 eval_dataloader = torch.utils.data.DataLoader(eval_dataset, batch_size=max_batch_size,
                         shuffle=True)#, num_workers=2)
 
-device = 'cpu'
+device = 'cuda'
 
 @dataclass
 class train_config:
@@ -57,7 +57,7 @@ class train_config:
     num_epochs: int = 1
     eval_steps: int = 200
     out_dir: str = 'out'
-    device_type: str = 'cpu'
+    device_type: str = 'cuda'
     ptdtype: str = 'float32'
     grad_clip: float = 1.0
     gradient_accumulation_steps: int = 1
