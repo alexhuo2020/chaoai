@@ -43,7 +43,7 @@ print(eval_dataset)
 eval_dataloader = torch.utils.data.DataLoader(eval_dataset, batch_size=max_batch_size,
                         shuffle=True)#, num_workers=2)
 
-device = 'cpu'
+device = 'cuda'
 
 @dataclass
 class train_config:
