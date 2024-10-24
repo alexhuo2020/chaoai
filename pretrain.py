@@ -47,12 +47,12 @@ device = 'cuda'
 
 @dataclass
 class train_config:
-    learning_rate: float = 1e-2
+    learning_rate: float = 1e-3
     decay_lr: bool = True
     lr_decay_iters: int = 5000
     max_iters: int = 5000
     max_eval_iters: int = 100
-    min_lr: float = 1e-3
+    min_lr: float = 1e-4
     warmup_iters: int = 100
     num_epochs: int = 1
     eval_steps: int = 200
