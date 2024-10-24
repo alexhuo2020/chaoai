@@ -1,5 +1,5 @@
 import torch 
-from model import LLM, LMConfig
+from model2 import LLM, LMConfig
 from train_single import train
 from dataclasses import dataclass 
 from typing import Optional
@@ -43,21 +43,21 @@ print(eval_dataset)
 eval_dataloader = torch.utils.data.DataLoader(eval_dataset, batch_size=max_batch_size,
                         shuffle=True)#, num_workers=2)
 
-device = 'cuda'
+device = 'cpu'
 
 @dataclass
 class train_config:
-    learning_rate: float = 1e-3
+    learning_rate: float = 1e-2
     decay_lr: bool = True
     lr_decay_iters: int = 5000
     max_iters: int = 5000
     max_eval_iters: int = 100
-    min_lr: float = 1e-4
+    min_lr: float = 1e-3
     warmup_iters: int = 100
     num_epochs: int = 1
     eval_steps: int = 200
     out_dir: str = 'out'
-    device_type: str = 'cuda'
+    device_type: str = 'cpu'
     ptdtype: str = 'float32'
     grad_clip: float = 1.0
     gradient_accumulation_steps: int = 1
@@ -66,7 +66,7 @@ class train_config:
 
 model = LLM(LMConfig).to(device)
 print("number parameters of Llama Model %d"% model.get_num_params())
-
+print(model)
 optimizer = torch.optim.AdamW(model.parameters(), lr=train_config.learning_rate)
 # import wandb
 # wandb_project = 'shakespeare'

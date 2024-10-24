@@ -91,16 +91,17 @@ class MLP(nn.Module):
         return logits
     
 class TransformerBlock(nn.Module):
-    def __init__(self, config):
+    def __init__(self, dim, out_dim, num_heads, mlp_hidden_dim, mlp_act_fn):
         super().__init__()
-        self.self_attn = Attention(config.dim, config.num_heads)
-        self.mlp = MLP(config.dim, config.mlp_hidden_dim, config.dim, config.mlp_act_fn)
-        self.n_layers = config.n_layers
+        self.self_attn = Attention(dim, num_heads)
+        self.mlp = MLP(dim, mlp_hidden_dim, out_dim, mlp_act_fn)
+        self.skip = nn.Linear(dim, out_dim)
+        # self.n_layers = config.n_layers
     def forward(self, x, mask: Optional[torch.Tensor]):
         # h = self.self_attn(x, mask)
-        # out =  self.mlp(h) / math.sqrt(self.n_layers) + x
-        h = x + self.self_attn(x, mask) / math.sqrt(self.n_layers)
-        out = h + self.mlp(h) / math.sqrt(self.n_layers)
+        # out =  self.mlp(h) #/ math.sqrt(self.n_layers) + x
+        h = x + self.self_attn(x, mask) #/ math.sqrt(self.n_layers)
+        out = self.skip( h) + self.mlp(h) #/ math.sqrt(self.n_layers)
         return out
     
 class LLM(nn.Module):
@@ -112,8 +113,10 @@ class LLM(nn.Module):
 
         self.embed_tokens = nn.Embedding(config.vocab_size, config.dim)
         self.layers = nn.ModuleList()
+        dims = [384, 192, 96, 192, 384]
+        # dims = [384, 384, 384, 384, 384]
         for layer_id in range(self.n_layers):
-            self.layers.append(TransformerBlock(config))
+            self.layers.append(TransformerBlock(dims[layer_id],dims[layer_id+1],2,dims[layer_id],F.silu))
         self.lm_head = nn.Linear(config.dim, config.vocab_size, bias=False)
         self.embed_tokens.weight = self.lm_head.weight
     def forward(self, input_ids, labels = None):
@@ -148,13 +151,13 @@ class LLM(nn.Module):
     def get_num_params(self):
         return sum([p.numel() for p in self.parameters()])
 
-
+### 6 layers: 384 -> 96 -> 24 -> 96 -> 384 
 @dataclass
 class LMConfig:
-    dim: int = 64
+    dim: int = 384
     n_layers: int = 4
     vocab_size: int = 65
-    num_heads: int = 4
+    num_heads: int = 1
     mlp_hidden_dim: int = 128
     mlp_act_fn: Callable[[torch.Tensor], torch.Tensor] =  F.silu
 
